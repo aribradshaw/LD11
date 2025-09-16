@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="./public/favicon2.png" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon2.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#34419A" />
     <meta
@@ -30,23 +30,5 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    
-    <!-- Load React app -->
-    <?php
-    // Find the built JS and CSS files
-    $staticDir = './static/';
-    $jsFiles = glob($staticDir . 'js/*.js');
-    $cssFiles = glob($staticDir . 'css/*.css');
-    
-    // Load CSS files
-    foreach ($cssFiles as $cssFile) {
-        echo '<link rel="stylesheet" href="' . $cssFile . '">' . "\n    ";
-    }
-    
-    // Load JS files
-    foreach ($jsFiles as $jsFile) {
-        echo '<script src="' . $jsFile . '"></script>' . "\n    ";
-    }
-    ?>
   </body>
 </html>

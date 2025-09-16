@@ -24,7 +24,7 @@ jobs:
     - name: Build React app
       run: npm run build
       
-    - name: Deploy to HostGator via FTP
+    - name: Deploy React build to HostGator via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
         server: ${{ secrets.FTP_HOST }}
@@ -38,6 +38,7 @@ jobs:
           **/node_modules/**
           **/.env
           **/.env.*
+          index.html
           
     - name: Upload PHP files
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
