@@ -24,6 +24,15 @@ jobs:
     - name: Build React app
       run: npm run build
       
+    - name: List build files
+      run: |
+        echo "Build directory contents:"
+        ls -la build/
+        echo "Build static directory contents:"
+        ls -la build/static/ || echo "No static directory"
+        echo "Build index.html exists:"
+        ls -la build/index.html || echo "No index.html found"
+        
     - name: Deploy React build to HostGator via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
@@ -32,25 +41,8 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./build/
         server-dir: /sunbeltsolutions.org/ld11/
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/node_modules/**
-          **/.env
-          **/.env.*
           
-    - name: Upload index.html from build
-      uses: SamKirkland/FTP-Deploy-Action@4.3.3
-      with:
-        server: ${{ secrets.FTP_HOST }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./build/
-        server-dir: /sunbeltsolutions.org/ld11/
-        include: |
-          index.html
-          
-    - name: Upload PHP files
+    - name: Upload PHP and HTML files
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
         server: ${{ secrets.FTP_HOST }}
@@ -60,6 +52,7 @@ jobs:
         server-dir: /sunbeltsolutions.org/ld11/
         include: |
           index.php
+          index.html
           fixed-api.php
           voters_api.php
           .htaccess

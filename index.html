@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./public/favicon2.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#34419A" />
+    <meta
+      name="description"
+      content="LD11 Campaign Data Visualization Dashboard"
+    />
+    <title>LD11 Dashboard</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #F1F1F1;
+      }
+      
+      code {
+        font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+          monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root">
+      <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+        <h1 style="color: #34419A;">LD11 Campaign Dashboard</h1>
+        <p style="color: #666;">React app is loading...</p>
+        <p style="color: #999; font-size: 14px;">If you see this message, the HTML is loading but React hasn't started yet.</p>
+      </div>
+    </div>
+    
+    <!-- Temporary: Load React from CDN for testing -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script>
+      // Simple test to see if React loads
+      console.log('React loaded:', typeof React);
+      console.log('ReactDOM loaded:', typeof ReactDOM);
+      
+      // Show a simple message
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(React.createElement('div', {
+        style: {
+          textAlign: 'center',
+          padding: '50px',
+          fontFamily: 'Arial, sans-serif'
+        }
+      }, [
+        React.createElement('h1', {
+          style: { color: '#34419A' }
+        }, 'LD11 Campaign Dashboard'),
+        React.createElement('p', {
+          style: { color: '#666' }
+        }, 'React is working! 🎉'),
+        React.createElement('p', {
+          style: { color: '#999', fontSize: '14px' }
+        }, 'Now we need to load the actual React app...')
+      ]));
+    </script>
+  </body>
+</html>
