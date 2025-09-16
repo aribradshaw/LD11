@@ -1,13 +1,13 @@
 RewriteEngine On
 RewriteBase /ld11/
 
-# Handle API requests first
+# Handle API requests
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} ^/ld11/.*\.php$
-RewriteRule ^(.*)$ /ld11/$1 [L]
+RewriteCond %{REQUEST_URI} ^/ld11/api\.php
+RewriteRule ^api\.php$ /ld11/api.php [L]
 
-# Handle React Router for all other requests
+# Handle React Router
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /ld11/index.html [L]
@@ -17,7 +17,7 @@ Header always set X-Content-Type-Options nosniff
 Header always set X-Frame-Options DENY
 Header always set X-XSS-Protection "1; mode=block"
 
-# Enable CORS for API requests
+# CORS headers
 Header always set Access-Control-Allow-Origin "*"
 Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
 Header always set Access-Control-Allow-Headers "Content-Type"
