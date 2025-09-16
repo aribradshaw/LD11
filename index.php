@@ -33,10 +33,27 @@
     
     <!-- Load React app -->
     <?php
-    // Find the built JS and CSS files
+    // Debug: Check what files exist
     $staticDir = './static/';
-    $jsFiles = glob($staticDir . 'js/*.js');
-    $cssFiles = glob($staticDir . 'css/*.css');
+    $jsDir = $staticDir . 'js/';
+    $cssDir = $staticDir . 'css/';
+    
+    // Check if directories exist
+    if (is_dir($jsDir)) {
+        $jsFiles = glob($jsDir . '*.js');
+    } else {
+        $jsFiles = [];
+    }
+    
+    if (is_dir($cssDir)) {
+        $cssFiles = glob($cssDir . '*.css');
+    } else {
+        $cssFiles = [];
+    }
+    
+    // Debug output
+    echo "<!-- Debug: JS files found: " . count($jsFiles) . " -->\n    ";
+    echo "<!-- Debug: CSS files found: " . count($cssFiles) . " -->\n    ";
     
     // Load CSS files
     foreach ($cssFiles as $cssFile) {
@@ -46,6 +63,20 @@
     // Load JS files
     foreach ($jsFiles as $jsFile) {
         echo '<script src="' . $jsFile . '"></script>' . "\n    ";
+    }
+    
+    // If no files found, show debug info
+    if (empty($jsFiles) && empty($cssFiles)) {
+        echo "<!-- Debug: No React files found. Checking directories... -->\n    ";
+        echo "<!-- JS dir exists: " . (is_dir($jsDir) ? 'yes' : 'no') . " -->\n    ";
+        echo "<!-- CSS dir exists: " . (is_dir($cssDir) ? 'yes' : 'no') . " -->\n    ";
+        echo "<!-- Static dir exists: " . (is_dir($staticDir) ? 'yes' : 'no') . " -->\n    ";
+        
+        // List all files in static directory
+        if (is_dir($staticDir)) {
+            $allFiles = scandir($staticDir);
+            echo "<!-- Files in static/: " . implode(', ', $allFiles) . " -->\n    ";
+        }
     }
     ?>
   </body>
