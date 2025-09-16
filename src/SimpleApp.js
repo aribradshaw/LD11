@@ -1,33 +1,41 @@
 import React, { useState } from 'react';
 import SimpleDataTab from './components/SimpleDataTab';
 import SimpleVotersTab from './components/SimpleVotersTab';
-import './App.css';
+import './SimpleApp.css';
 
 function SimpleApp() {
-  const [activeTab, setActiveTab] = useState('data');
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   return (
-    <div className="App">
+    <div className="simple-app">
       <header className="app-header">
-        <h1>LD11 Campaign Dashboard</h1>
-        <nav className="tab-navigation">
-          <button 
-            className={`tab-link ${activeTab === 'data' ? 'active' : ''}`}
-            onClick={() => setActiveTab('data')}
-          >
-            Data
-          </button>
-          <button 
-            className={`tab-link ${activeTab === 'voters' ? 'active' : ''}`}
-            onClick={() => setActiveTab('voters')}
-          >
-            Voters
-          </button>
-        </nav>
+        <div className="header-content">
+          <img src="/ld11/public/smalllogo.png" alt="LD11 Logo" className="header-logo" />
+          <div className="header-text">
+            <h1>LD11 Campaign Dashboard</h1>
+            <p className="subtitle">2024 Meta Ad Spend & Election Results</p>
+          </div>
+        </div>
       </header>
-      
-      <main className="app-main">
-        {activeTab === 'data' ? <SimpleDataTab /> : <SimpleVotersTab />}
+
+      <nav className="tab-navigation">
+        <button 
+          className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}
+          onClick={() => setActiveTab('dashboard')}
+        >
+          📊 Dashboard
+        </button>
+        <button 
+          className={`tab-button ${activeTab === 'voters' ? 'active' : ''}`}
+          onClick={() => setActiveTab('voters')}
+        >
+          👥 Voters
+        </button>
+      </nav>
+
+      <main className="app-content">
+        {activeTab === 'dashboard' && <SimpleDataTab />}
+        {activeTab === 'voters' && <SimpleVotersTab />}
       </main>
     </div>
   );
