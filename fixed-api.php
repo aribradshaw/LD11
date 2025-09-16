@@ -36,7 +36,7 @@ switch ($request) {
 }
 
 function getAdSpendData() {
-    $csvFile = 'public/ld11adspend.csv';
+    $csvFile = './public/ld11adspend.csv';
     
     if (!file_exists($csvFile)) {
         http_response_code(404);
@@ -72,7 +72,7 @@ function getAdSpendData() {
 }
 
 function getVoterData() {
-    $jsonFile = 'public/ld11results.json';
+    $jsonFile = './public/ld11results.json';
     
     if (!file_exists($jsonFile)) {
         http_response_code(404);
@@ -90,7 +90,7 @@ function getVoterData() {
 }
 
 function getResultsData() {
-    $csvFile = 'public/results.csv';
+    $csvFile = './public/results.csv';
     
     if (!file_exists($csvFile)) {
         http_response_code(404);
@@ -312,7 +312,7 @@ function getPrecinctAnalysis($data) {
 }
 
 function calculateTotalSpent() {
-    $csvFile = 'public/ld11adspend.csv';
+    $csvFile = './public/ld11adspend.csv';
     if (!file_exists($csvFile)) return 0;
     
     $total = 0;
@@ -329,7 +329,7 @@ function calculateTotalSpent() {
 }
 
 function calculateTotalReach() {
-    $csvFile = 'public/ld11adspend.csv';
+    $csvFile = './public/ld11adspend.csv';
     if (!file_exists($csvFile)) return 0;
     
     $total = 0;

@@ -48,7 +48,9 @@ jobs:
         local-dir: ./
         server-dir: /sunbeltsolutions.org/ld11/
         include: |
-          *.php
+          index.php
+          fixed-api.php
+          voters_api.php
           .htaccess
           
     - name: Upload public assets
