@@ -1,10 +1,13 @@
 Options -MultiViews
 RewriteEngine On
 
+# Prioritize index.php over index.html
+DirectoryIndex index.php index.html
+
 # Handle React Router
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.html [QSA,L]
+RewriteRule ^ index.php [QSA,L]
 
 # Security headers
 Header always set X-Content-Type-Options nosniff

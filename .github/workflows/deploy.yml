@@ -38,7 +38,7 @@ jobs:
           **/node_modules/**
           **/.env
           **/.env.*
-          index.html
+          **/*.html
           
     - name: Upload PHP files
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
