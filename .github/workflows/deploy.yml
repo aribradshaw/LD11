@@ -41,7 +41,7 @@ jobs:
         local-dir: ./deploy/
         server-dir: /public_html/ld11/
           
-    - name: Create .htaccess file
+    - name: Create and upload .htaccess file
       run: |
         echo "RewriteEngine On" > .htaccess
         echo "RewriteBase /ld11/" >> .htaccess
@@ -56,11 +56,14 @@ jobs:
         echo "Header always set X-Frame-Options DENY" >> .htaccess
         echo "Header always set X-XSS-Protection \"1; mode=block\"" >> .htaccess
         
+        # Copy .htaccess to deploy directory
+        cp .htaccess deploy/
+        
     - name: Upload .htaccess
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_HOST }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: .htaccess
+        local-dir: ./deploy/
         server-dir: /public_html/ld11/
