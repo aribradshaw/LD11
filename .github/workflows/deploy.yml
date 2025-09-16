@@ -40,18 +40,3 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./deploy/
         server-dir: /sunbeltsolutions.org/ld11/
-        
-    # - name: Upload parent .htaccess
-      run: |
-        mkdir -p deploy/parent
-        cp parent-htaccess deploy/parent/.htaccess
-        
-    # - name: Deploy parent .htaccess
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-      with:
-        server: ${{ secrets.FTP_HOST }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./deploy/parent/
-        server-dir: /sunbeltsolutions.org/
-          
