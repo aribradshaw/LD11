@@ -5,65 +5,450 @@
     <link rel="icon" href="./public/favicon2.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#34419A" />
-    <meta
-      name="description"
-      content="LD11 Campaign Data Visualization Dashboard"
-    />
+    <meta name="description" content="LD11 Campaign Data Visualization Dashboard" />
     <title>LD11 Dashboard</title>
     <style>
       body {
         margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-          sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         background-color: #F1F1F1;
-      }
-      
-      code {
-        font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-          monospace;
       }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root">
-      <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
-        <h1 style="color: #34419A;">LD11 Campaign Dashboard</h1>
-        <p style="color: #666;">React app is loading...</p>
-        <p style="color: #999; font-size: 14px;">If you see this message, the HTML is loading but React hasn't started yet.</p>
-      </div>
-    </div>
+    <div id="root"></div>
     
-    <!-- Temporary: Load React from CDN for testing -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
+    
     <script>
-      // Simple test to see if React loads
-      console.log('React loaded:', typeof React);
-      console.log('ReactDOM loaded:', typeof ReactDOM);
+      const { useState, useEffect } = React;
+      const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } = Recharts;
       
-      // Show a simple message
-      const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(React.createElement('div', {
-        style: {
-          textAlign: 'center',
-          padding: '50px',
-          fontFamily: 'Arial, sans-serif'
+      function SimpleApp() {
+        const [activeTab, setActiveTab] = useState('dashboard');
+        const [adSpendData, setAdSpendData] = useState(null);
+        const [voterData, setVoterData] = useState(null);
+        const [resultsData, setResultsData] = useState(null);
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState(null);
+
+        useEffect(() => {
+          fetchAllData();
+        }, []);
+
+        const fetchAllData = async () => {
+          try {
+            setLoading(true);
+            setError(null);
+            
+            const [adSpendResponse, voterResponse, resultsResponse] = await Promise.all([
+              axios.get('./fixed-api.php?endpoint=adspend'),
+              axios.get('./fixed-api.php?endpoint=voterdata'),
+              axios.get('./fixed-api.php?endpoint=results')
+            ]);
+
+            setAdSpendData(adSpendResponse.data);
+            setVoterData(voterResponse.data);
+            setResultsData(resultsResponse.data);
+          } catch (err) {
+            console.error('Data fetch error:', err);
+            setError('Failed to load dashboard data. Please check your connection and try again.');
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        if (loading) {
+          return React.createElement('div', { 
+            style: { 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              padding: '3rem', 
+              color: '#666' 
+            } 
+          }, [
+            React.createElement('div', { 
+              style: { 
+                width: '40px', 
+                height: '40px', 
+                border: '4px solid #F1F1F1', 
+                borderTop: '4px solid #34419A', 
+                borderRadius: '50%', 
+                animation: 'spin 1s linear infinite',
+                marginBottom: '1rem'
+              } 
+            }),
+            React.createElement('p', null, 'Loading dashboard data...')
+          ]);
         }
-      }, [
-        React.createElement('h1', {
-          style: { color: '#34419A' }
-        }, 'LD11 Campaign Dashboard'),
-        React.createElement('p', {
-          style: { color: '#666' }
-        }, 'React is working! 🎉'),
-        React.createElement('p', {
-          style: { color: '#999', fontSize: '14px' }
-        }, 'Now we need to load the actual React app...')
-      ]));
+
+        if (error) {
+          return React.createElement('div', { 
+            style: { 
+              background: '#fee', 
+              color: '#c33', 
+              padding: '1rem', 
+              borderRadius: '8px', 
+              border: '1px solid #fcc', 
+              margin: '1rem 0' 
+            } 
+          }, [
+            React.createElement('p', null, error),
+            React.createElement('button', { 
+              onClick: fetchAllData,
+              style: { 
+                background: '#34419A', 
+                color: 'white', 
+                border: 'none', 
+                padding: '0.75rem 1.5rem', 
+                borderRadius: '6px', 
+                cursor: 'pointer' 
+              }
+            }, '🔄 Retry')
+          ]);
+        }
+
+        const optimizationData = adSpendData?.by_optimization ? 
+          Object.entries(adSpendData.by_optimization).map(([key, value]) => ({
+            name: key,
+            spent: value.total_spent
+          })) : [];
+
+        const voterRegistrationData = voterData ? [
+          { name: 'Republican', value: voterData[0]['Registered Voters'].Republican, color: '#9A3434' },
+          { name: 'Democrat', value: voterData[0]['Registered Voters'].Democrat, color: '#34419A' },
+          { name: 'Other', value: voterData[0]['Registered Voters'].Other, color: '#222222' }
+        ] : [];
+
+        return React.createElement('div', { style: { minHeight: '100vh', display: 'flex', flexDirection: 'column' } }, [
+          // Header
+          React.createElement('header', { 
+            style: { 
+              background: 'linear-gradient(135deg, #34419A 0%, #9A3434 100%)', 
+              color: 'white', 
+              padding: '1.5rem 1rem', 
+              textAlign: 'center', 
+              boxShadow: '0 2px 10px rgba(0,0,0,0.1)' 
+            } 
+          }, [
+            React.createElement('div', { 
+              style: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' } 
+            }, [
+              React.createElement('img', { 
+                src: './public/smalllogo.png', 
+                alt: 'LD11 Logo', 
+                style: { height: '50px', width: 'auto', filter: 'brightness(0) invert(1)' } 
+              }),
+              React.createElement('div', { style: { textAlign: 'center' } }, [
+                React.createElement('h1', { style: { fontSize: '1.8rem', fontWeight: '700', margin: '0 0 0.5rem 0' } }, 'LD11 Campaign Dashboard'),
+                React.createElement('p', { style: { fontSize: '0.9rem', opacity: '0.9', margin: '0' } }, '2024 Meta Ad Spend & Election Results')
+              ])
+            ])
+          ]),
+          
+          // Navigation
+          React.createElement('nav', { 
+            style: { 
+              display: 'flex', 
+              background: 'white', 
+              borderBottom: '1px solid #e9ecef', 
+              boxShadow: '0 2px 4px rgba(0,0,0,0.05)' 
+            } 
+          }, [
+            React.createElement('button', { 
+              onClick: () => setActiveTab('dashboard'),
+              style: { 
+                flex: '1', 
+                padding: '1rem', 
+                border: 'none', 
+                background: activeTab === 'dashboard' ? '#F1F1F1' : 'white', 
+                color: activeTab === 'dashboard' ? '#34419A' : '#666', 
+                fontSize: '1rem', 
+                fontWeight: '500', 
+                cursor: 'pointer', 
+                borderBottom: activeTab === 'dashboard' ? '3px solid #34419A' : '3px solid transparent'
+              } 
+            }, '📊 Dashboard'),
+            React.createElement('button', { 
+              onClick: () => setActiveTab('voters'),
+              style: { 
+                flex: '1', 
+                padding: '1rem', 
+                border: 'none', 
+                background: activeTab === 'voters' ? '#F1F1F1' : 'white', 
+                color: activeTab === 'voters' ? '#34419A' : '#666', 
+                fontSize: '1rem', 
+                fontWeight: '500', 
+                cursor: 'pointer', 
+                borderBottom: activeTab === 'voters' ? '3px solid #34419A' : '3px solid transparent'
+              } 
+            }, '👥 Voters')
+          ]),
+          
+          // Content
+          React.createElement('main', { 
+            style: { 
+              flex: '1', 
+              padding: '1rem', 
+              maxWidth: '1200px', 
+              margin: '0 auto', 
+              width: '100%' 
+            } 
+          }, [
+            activeTab === 'dashboard' ? React.createElement('div', null, [
+              // Metrics
+              React.createElement('div', { 
+                style: { 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+                  gap: '1rem', 
+                  marginBottom: '2rem' 
+                } 
+              }, [
+                React.createElement('div', { 
+                  style: { 
+                    background: 'white', 
+                    borderRadius: '8px', 
+                    padding: '1.5rem', 
+                    textAlign: 'center', 
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
+                    borderLeft: '4px solid #34419A' 
+                  } 
+                }, [
+                  React.createElement('div', { 
+                    style: { fontSize: '1.8rem', fontWeight: '700', color: '#34419A', marginBottom: '0.5rem' } 
+                  }, `$${adSpendData?.spending_summary?.total?.toLocaleString() || '0'}`),
+                  React.createElement('div', { 
+                    style: { fontSize: '0.85rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' } 
+                  }, 'Total Ad Spend')
+                ]),
+                React.createElement('div', { 
+                  style: { 
+                    background: 'white', 
+                    borderRadius: '8px', 
+                    padding: '1.5rem', 
+                    textAlign: 'center', 
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
+                    borderLeft: '4px solid #34419A' 
+                  } 
+                }, [
+                  React.createElement('div', { 
+                    style: { fontSize: '1.8rem', fontWeight: '700', color: '#34419A', marginBottom: '0.5rem' } 
+                  }, `${adSpendData?.performance_metrics?.total_reach?.toLocaleString() || '0'}`),
+                  React.createElement('div', { 
+                    style: { fontSize: '0.85rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' } 
+                  }, 'Total Reach')
+                ]),
+                React.createElement('div', { 
+                  style: { 
+                    background: 'white', 
+                    borderRadius: '8px', 
+                    padding: '1.5rem', 
+                    textAlign: 'center', 
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
+                    borderLeft: '4px solid #34419A' 
+                  } 
+                }, [
+                  React.createElement('div', { 
+                    style: { fontSize: '1.8rem', fontWeight: '700', color: '#34419A', marginBottom: '0.5rem' } 
+                  }, `${resultsData?.turnout_summary?.overall_turnout?.toFixed(1) || '0'}%`),
+                  React.createElement('div', { 
+                    style: { fontSize: '0.85rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' } 
+                  }, 'Overall Turnout')
+                ]),
+                React.createElement('div', { 
+                  style: { 
+                    background: 'white', 
+                    borderRadius: '8px', 
+                    padding: '1.5rem', 
+                    textAlign: 'center', 
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
+                    borderLeft: '4px solid #34419A' 
+                  } 
+                }, [
+                  React.createElement('div', { 
+                    style: { fontSize: '1.8rem', fontWeight: '700', color: '#34419A', marginBottom: '0.5rem' } 
+                  }, `${resultsData?.turnout_summary?.total_registered?.toLocaleString() || '0'}`),
+                  React.createElement('div', { 
+                    style: { fontSize: '0.85rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' } 
+                  }, 'Registered Voters')
+                ])
+              ]),
+              
+              // Charts
+              React.createElement('div', { 
+                style: { 
+                  background: 'white', 
+                  borderRadius: '12px', 
+                  padding: '1.5rem', 
+                  marginBottom: '1.5rem', 
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
+                  border: '1px solid #e9ecef' 
+                } 
+              }, [
+                React.createElement('h3', { 
+                  style: { 
+                    fontSize: '1.25rem', 
+                    fontWeight: '600', 
+                    marginBottom: '1rem', 
+                    color: '#222222', 
+                    borderBottom: '2px solid #34419A', 
+                    paddingBottom: '0.5rem' 
+                  } 
+                }, 'Ad Spend by Optimization Type'),
+                React.createElement('div', { style: { height: '300px' } }, [
+                  React.createElement(ResponsiveContainer, { width: '100%', height: '100%' }, [
+                    React.createElement(BarChart, { data: optimizationData }, [
+                      React.createElement(CartesianGrid, { strokeDasharray: '3 3' }),
+                      React.createElement(XAxis, { dataKey: 'name' }),
+                      React.createElement(YAxis),
+                      React.createElement(Tooltip, { formatter: (value) => [`$${value.toLocaleString()}`, 'Spent'] }),
+                      React.createElement(Bar, { dataKey: 'spent', fill: '#34419A' })
+                    ])
+                  ])
+                ])
+              ]),
+              
+              React.createElement('div', { 
+                style: { 
+                  background: 'white', 
+                  borderRadius: '12px', 
+                  padding: '1.5rem', 
+                  marginBottom: '1.5rem', 
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
+                  border: '1px solid #e9ecef' 
+                } 
+              }, [
+                React.createElement('h3', { 
+                  style: { 
+                    fontSize: '1.25rem', 
+                    fontWeight: '600', 
+                    marginBottom: '1rem', 
+                    color: '#222222', 
+                    borderBottom: '2px solid #34419A', 
+                    paddingBottom: '0.5rem' 
+                  } 
+                }, 'Voter Registration by Party'),
+                React.createElement('div', { style: { height: '300px' } }, [
+                  React.createElement(ResponsiveContainer, { width: '100%', height: '100%' }, [
+                    React.createElement(PieChart, null, [
+                      React.createElement(Pie, {
+                        data: voterRegistrationData,
+                        cx: '50%',
+                        cy: '50%',
+                        labelLine: false,
+                        label: ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`,
+                        outerRadius: 80,
+                        fill: '#8884d8',
+                        dataKey: 'value'
+                      }, voterRegistrationData.map((entry, index) => 
+                        React.createElement(Cell, { key: `cell-${index}`, fill: entry.color })
+                      )),
+                      React.createElement(Tooltip)
+                    ])
+                  ])
+                ])
+              ])
+            ]) : React.createElement('div', { 
+              style: { 
+                background: 'white', 
+                borderRadius: '12px', 
+                padding: '2rem', 
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' 
+              } 
+            }, [
+              React.createElement('h2', { 
+                style: { 
+                  fontSize: '1.5rem', 
+                  fontWeight: '600', 
+                  color: '#333', 
+                  margin: '0 0 1rem 0' 
+                } 
+              }, 'Voter Database Management'),
+              React.createElement('p', { style: { color: '#666' } }, 'Database setup and voter management features will be available here.')
+            ])
+          ])
+        ]);
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(React.createElement(SimpleApp));
     </script>
+    
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      @media (max-width: 768px) {
+        .header-content {
+          flex-direction: column !important;
+          gap: 0.5rem !important;
+        }
+        .header-logo {
+          height: 40px !important;
+        }
+        .app-header h1 {
+          font-size: 1.5rem !important;
+        }
+        .subtitle {
+          font-size: 0.8rem !important;
+        }
+        .tab-button {
+          padding: 0.75rem 0.5rem !important;
+          font-size: 0.9rem !important;
+        }
+        .app-content {
+          padding: 0.75rem !important;
+        }
+        .card {
+          padding: 1rem !important;
+          margin-bottom: 1rem !important;
+        }
+        .metrics-grid {
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 0.75rem !important;
+        }
+        .metric-card {
+          padding: 1rem !important;
+        }
+        .metric-value {
+          font-size: 1.5rem !important;
+        }
+        .chart-container {
+          height: 250px !important;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .app-content {
+          padding: 0.5rem !important;
+        }
+        .header-logo {
+          height: 35px !important;
+        }
+        .app-header h1 {
+          font-size: 1.3rem !important;
+        }
+        .metrics-grid {
+          grid-template-columns: 1fr !important;
+        }
+        .metric-value {
+          font-size: 1.3rem !important;
+        }
+        .chart-container {
+          height: 200px !important;
+        }
+      }
+    </style>
   </body>
 </html>
