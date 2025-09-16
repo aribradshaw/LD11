@@ -33,9 +33,9 @@ const SimpleDataTab = () => {
       setError(null);
       
       const [adSpendResponse, voterResponse, resultsResponse] = await Promise.all([
-        axios.get('/ld11/fixed-api.php?endpoint=adspend'),
-        axios.get('/ld11/fixed-api.php?endpoint=voterdata'),
-        axios.get('/ld11/fixed-api.php?endpoint=results')
+        axios.get('./fixed-api.php?endpoint=adspend'),
+        axios.get('./fixed-api.php?endpoint=voterdata'),
+        axios.get('./fixed-api.php?endpoint=results')
       ]);
 
       setAdSpendData(adSpendResponse.data);

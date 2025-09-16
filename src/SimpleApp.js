@@ -10,7 +10,7 @@ function SimpleApp() {
     <div className="simple-app">
       <header className="app-header">
         <div className="header-content">
-          <img src="/ld11/public/smalllogo.png" alt="LD11 Logo" className="header-logo" />
+          <img src="./public/smalllogo.png" alt="LD11 Logo" className="header-logo" />
           <div className="header-text">
             <h1>LD11 Campaign Dashboard</h1>
             <p className="subtitle">2024 Meta Ad Spend & Election Results</p>
