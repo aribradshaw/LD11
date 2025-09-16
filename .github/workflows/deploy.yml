@@ -38,7 +38,17 @@ jobs:
           **/node_modules/**
           **/.env
           **/.env.*
-          **/*.html
+          
+    - name: Upload index.html from build
+      uses: SamKirkland/FTP-Deploy-Action@4.3.3
+      with:
+        server: ${{ secrets.FTP_HOST }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./build/
+        server-dir: /sunbeltsolutions.org/ld11/
+        include: |
+          index.html
           
     - name: Upload PHP files
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
