@@ -14,7 +14,7 @@ const VotersTab = () => {
 
   const checkDatabaseStatus = async () => {
     try {
-      const response = await axios.get('voters_api.php?action=status');
+      const response = await axios.get('/ld11/voters_api.php?action=status');
       setDbStatus(response.data.connected ? 'connected' : 'disconnected');
       if (response.data.connected) {
         fetchVoters();
@@ -27,7 +27,7 @@ const VotersTab = () => {
   const fetchVoters = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('voters_api.php?action=fetch');
+      const response = await axios.get('/ld11/voters_api.php?action=fetch');
       setVoters(response.data.voters || []);
     } catch (err) {
       setError('Failed to fetch voters: ' + err.message);
@@ -52,7 +52,7 @@ const VotersTab = () => {
       setLoading(true);
       setUploadStatus('Uploading and processing CSV...');
       
-      const response = await axios.post('voters_api.php?action=upload', formData, {
+      const response = await axios.post('/ld11/voters_api.php?action=upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -76,7 +76,7 @@ const VotersTab = () => {
 
     try {
       setLoading(true);
-      await axios.post('voters_api.php?action=clear');
+      await axios.post('/ld11/voters_api.php?action=clear');
       setVoters([]);
       setUploadStatus('Database cleared successfully');
     } catch (err) {

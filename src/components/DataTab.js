@@ -33,9 +33,9 @@ const DataTab = () => {
     try {
       setLoading(true);
       const [adSpendResponse, voterResponse, resultsResponse] = await Promise.all([
-        axios.get('index.php?endpoint=adspend'),
-        axios.get('index.php?endpoint=voterdata'),
-        axios.get('index.php?endpoint=results')
+        axios.get('/ld11/index.php?endpoint=adspend'),
+        axios.get('/ld11/index.php?endpoint=voterdata'),
+        axios.get('/ld11/index.php?endpoint=results')
       ]);
 
       setAdSpendData(adSpendResponse.data);
