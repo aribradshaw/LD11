@@ -26,22 +26,21 @@ jobs:
       run: npm run build
       
     - name: Deploy to HostGator via FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      uses: wlixcc/SFTP-Deploy-Action@v1.2.4
       with:
         server: ${{ secrets.FTP_HOST }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: /home/runner/work/LD11/LD11/
-        server-dir: /public_html/ld11/
+        local_path: './*'
+        remote_path: '/public_html/ld11/'
         exclude: |
-          **/.git*
-          **/.git*/**
-          **/node_modules/**
-          **/.github/**
-          **/deploy.sh
-          **/deploy-config.md
-          **/.gitignore
-          **/README.md
+          .git*
+          .github/
+          node_modules/
+          deploy.sh
+          deploy-config.md
+          .gitignore
+          README.md
           
     - name: Create .htaccess file
       run: |
