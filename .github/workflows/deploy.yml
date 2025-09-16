@@ -25,22 +25,21 @@ jobs:
     - name: Build React app
       run: npm run build
       
+    - name: Prepare deployment files
+      run: |
+        mkdir -p deploy
+        cp index.php voters_api.php package.json deploy/
+        cp -r public deploy/
+        cp -r build deploy/
+        
     - name: Deploy to HostGator via FTP
-      uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_HOST }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local_path: './*'
-        remote_path: '/public_html/ld11/'
-        exclude: |
-          .git*
-          .github/
-          node_modules/
-          deploy.sh
-          deploy-config.md
-          .gitignore
-          README.md
+        local-dir: ./deploy/
+        server-dir: /public_html/ld11/
           
     - name: Create .htaccess file
       run: |
