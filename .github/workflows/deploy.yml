@@ -1,0 +1,126 @@
+name: Deploy LD11 Dashboard
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build React app
+      run: npm run build
+      
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          # Create directory if it doesn't exist
+          mkdir -p /sunbeltsolutions.org/ld11
+          
+          # Backup current deployment
+          if [ -d "/sunbeltsolutions.org/ld11/backup" ]; then
+            rm -rf /sunbeltsolutions.org/ld11/backup
+          fi
+          if [ -d "/sunbeltsolutions.org/ld11/current" ]; then
+            mv /sunbeltsolutions.org/ld11/current /sunbeltsolutions.org/ld11/backup
+          fi
+          
+          # Create new deployment directory
+          mkdir -p /sunbeltsolutions.org/ld11/current
+          
+    - name: Copy files to server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
+        source: "index.php,voters_api.php,package.json,README.md"
+        target: "/sunbeltsolutions.org/ld11/current/"
+        
+    - name: Copy public directory
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
+        source: "public/"
+        target: "/sunbeltsolutions.org/ld11/current/"
+        
+    - name: Copy React build
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
+        source: "build/"
+        target: "/sunbeltsolutions.org/ld11/current/"
+        
+    - name: Finalize deployment
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          # Set proper permissions
+          chmod -R 755 /sunbeltsolutions.org/ld11/current
+          chmod 644 /sunbeltsolutions.org/ld11/current/*.php
+          chmod 644 /sunbeltsolutions.org/ld11/current/*.json
+          
+          # Update web server configuration if needed
+          # This assumes you're using Apache - adjust for Nginx if needed
+          if command -v apache2ctl >/dev/null 2>&1; then
+            # Create .htaccess for proper routing
+            cat > /sunbeltsolutions.org/ld11/current/.htaccess << 'EOF'
+          RewriteEngine On
+          RewriteBase /ld11/
+          
+          # Handle React Router
+          RewriteCond %{REQUEST_FILENAME} !-f
+          RewriteCond %{REQUEST_FILENAME} !-d
+          RewriteRule . /ld11/index.html [L]
+          
+          # Security headers
+          Header always set X-Content-Type-Options nosniff
+          Header always set X-Frame-Options DENY
+          Header always set X-XSS-Protection "1; mode=block"
+          EOF
+          fi
+          
+          # Activate new deployment
+          if [ -d "/sunbeltsolutions.org/ld11/live" ]; then
+            rm -rf /sunbeltsolutions.org/ld11/live
+          fi
+          mv /sunbeltsolutions.org/ld11/current /sunbeltsolutions.org/ld11/live
+          
+          # Clean up old backup after successful deployment
+          if [ -d "/sunbeltsolutions.org/ld11/backup" ]; then
+            rm -rf /sunbeltsolutions.org/ld11/backup
+          fi
+          
+          echo "Deployment completed successfully!"
+          echo "Dashboard available at: https://sunbeltsolutions.org/ld11/"

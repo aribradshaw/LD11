@@ -1,0 +1,31 @@
+[
+    {
+        "Registered Voters":{
+            "Republican": 20201,
+            "Democrat":56645,
+            "Other":53158
+
+        }
+    },
+    {
+        "General Voters":{
+            "Republican": 15734,
+            "Democrat": 46274,
+            "Other": 31052
+        }
+    },
+    {
+        "Primary Voters":{
+            "Republican": 7924,
+            "Democrat": 24817,
+            "Other": 6269
+        }
+    },
+    {
+        "Newly Registered Voters":{
+            "Republican": 1146,
+            "Democrat": 1564,
+            "Other": 4422
+        }
+    }
+]
