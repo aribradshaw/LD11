@@ -39,7 +39,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./deploy/
-        server-dir: /public_html/ld11/
+        server-dir: /sunbeltsolutions.org/ld11/
           
     - name: Create and upload .htaccess file
       run: |
@@ -66,4 +66,4 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./deploy/
-        server-dir: /public_html/ld11/
+        server-dir: /sunbeltsolutions.org/ld11/
