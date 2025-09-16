@@ -29,6 +29,7 @@ jobs:
       run: |
         mkdir -p deploy
         cp api.php package.json .htaccess deploy/
+        cp parent-htaccess deploy/.htaccess-parent
         cp -r public deploy/
         cp -r build deploy/
         
@@ -40,4 +41,13 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./deploy/
         server-dir: /sunbeltsolutions.org/ld11/
+        
+    - name: Upload parent .htaccess
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_HOST }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./deploy/.htaccess-parent
+        server-dir: /sunbeltsolutions.org/.htaccess
           

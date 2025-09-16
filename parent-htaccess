@@ -1,0 +1,23 @@
+Options +Indexes
+Allow from all
+Require all granted
+
+# Enable directory browsing
+DirectoryIndex index.html index.php
+
+# Allow access to all files
+<Files "*">
+    Require all granted
+</Files>
+
+# Specifically allow PHP files
+<Files "*.php">
+    Require all granted
+</Files>
+
+# Allow access to subdirectories
+<Directory "*">
+    Options +Indexes
+    Allow from all
+    Require all granted
+</Directory>
