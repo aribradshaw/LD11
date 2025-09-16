@@ -32,6 +32,8 @@ const DataTab = () => {
   const fetchAllData = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const [adSpendResponse, voterResponse, resultsResponse] = await Promise.all([
         axios.get('/ld11/fixed-api.php?endpoint=adspend'),
         axios.get('/ld11/fixed-api.php?endpoint=voterdata'),
@@ -42,18 +44,31 @@ const DataTab = () => {
       setVoterData(voterResponse.data);
       setResultsData(resultsResponse.data);
     } catch (err) {
-      setError('Failed to load data: ' + err.message);
+      console.error('Data fetch error:', err);
+      setError('Failed to load dashboard data. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return <div className="loading">Loading dashboard data...</div>;
+    return (
+      <div className="loading">
+        <div className="loading-spinner"></div>
+        <p>Loading dashboard data...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="error">{error}</div>;
+    return (
+      <div className="error-container">
+        <div className="error">{error}</div>
+        <button className="retry-button" onClick={fetchAllData}>
+          🔄 Retry
+        </button>
+      </div>
+    );
   }
 
   const COLORS = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'];
@@ -84,7 +99,20 @@ const DataTab = () => {
   const turnoutData = resultsData?.precinct_analysis?.all_precincts?.slice(0, 10) || [];
 
   return (
-    <div>
+    <div className="dashboard-container">
+      {/* Dashboard Header */}
+      <div className="dashboard-header">
+        <h2>Campaign Performance Dashboard</h2>
+        <div className="dashboard-controls">
+          <button className="refresh-button" onClick={fetchAllData} disabled={loading}>
+            🔄 Refresh Data
+          </button>
+          <div className="last-updated">
+            Last updated: {new Date().toLocaleTimeString()}
+          </div>
+        </div>
+      </div>
+
       {/* Key Metrics */}
       <div className="metrics-grid">
         <div className="metric-card">

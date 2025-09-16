@@ -1,10 +1,9 @@
-name: Deploy LD11 Dashboard
+name: Deploy to HostGator
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -12,30 +11,52 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
       
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v3
       with:
         node-version: '18'
+        cache: 'npm'
         
     - name: Install dependencies
-      run: npm install
+      run: npm ci
       
     - name: Build React app
       run: npm run build
       
-    - name: Prepare deployment files
-      run: |
-        mkdir -p deploy
-        cp index.html deploy/
-        cp -r public deploy/
-        
     - name: Deploy to HostGator via FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
         server: ${{ secrets.FTP_HOST }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./deploy/
+        local-dir: ./build/
         server-dir: /sunbeltsolutions.org/ld11/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/.env
+          **/.env.*
+          
+    - name: Upload PHP files
+      uses: SamKirkland/FTP-Deploy-Action@4.3.3
+      with:
+        server: ${{ secrets.FTP_HOST }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./
+        server-dir: /sunbeltsolutions.org/ld11/
+        include: |
+          *.php
+          .htaccess
+          
+    - name: Upload public assets
+      uses: SamKirkland/FTP-Deploy-Action@4.3.3
+      with:
+        server: ${{ secrets.FTP_HOST }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./public/
+        server-dir: /sunbeltsolutions.org/ld11/public/

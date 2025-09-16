@@ -45,23 +45,39 @@ const VotersTab = () => {
       return;
     }
 
+    // Check file size (limit to 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File size must be less than 10MB');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('csv_file', file);
 
     try {
       setLoading(true);
+      setError(null);
       setUploadStatus('Uploading and processing CSV...');
       
       const response = await axios.post('/ld11/voters_api.php?action=upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        timeout: 60000, // 60 second timeout for large files
       });
 
-      setUploadStatus(`Successfully uploaded ${response.data.imported} voters`);
-      setError(null);
-      await fetchVoters();
+      if (response.data.success) {
+        setUploadStatus(`Successfully imported ${response.data.imported} voters`);
+        if (response.data.errors && response.data.errors.length > 0) {
+          setUploadStatus(prev => prev + ` (${response.data.errors.length} errors)`);
+        }
+        await fetchVoters();
+      } else {
+        setError('Upload failed: ' + (response.data.error || 'Unknown error'));
+        setUploadStatus('');
+      }
     } catch (err) {
+      console.error('Upload error:', err);
       setError('Upload failed: ' + (err.response?.data?.error || err.message));
       setUploadStatus('');
     } finally {
@@ -100,23 +116,42 @@ const VotersTab = () => {
       {uploadStatus && <div style={{color: '#28a745', marginBottom: '1rem'}}>{uploadStatus}</div>}
 
       <div className="upload-section">
-        <h3>Upload LD11.csv File</h3>
-        <p>Upload your LD11.csv file to populate the voter database</p>
-        <input
-          type="file"
-          accept=".csv"
-          onChange={handleFileUpload}
-          disabled={loading}
-          style={{ marginBottom: '1rem' }}
-        />
-        <br />
-        <button 
-          className="upload-button" 
-          onClick={() => document.querySelector('input[type="file"]').click()}
-          disabled={loading}
-        >
-          {loading ? 'Processing...' : 'Choose CSV File'}
-        </button>
+        <h3>📁 Upload LD11.csv File</h3>
+        <p>Upload your LD11.csv file to populate the voter database. Maximum file size: 10MB</p>
+        
+        <div className="file-upload-area">
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleFileUpload}
+            disabled={loading}
+            id="csv-upload"
+            style={{ display: 'none' }}
+          />
+          <label htmlFor="csv-upload" className="file-upload-label">
+            {loading ? (
+              <div className="upload-progress">
+                <div className="progress-spinner"></div>
+                <span>Processing CSV...</span>
+              </div>
+            ) : (
+              <div className="upload-prompt">
+                <div className="upload-icon">📤</div>
+                <span>Click to select CSV file</span>
+                <small>or drag and drop here</small>
+              </div>
+            )}
+          </label>
+        </div>
+        
+        {loading && (
+          <div className="upload-progress-bar">
+            <div className="progress-bar">
+              <div className="progress-fill"></div>
+            </div>
+            <p>Processing your file...</p>
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>

@@ -1,176 +1,209 @@
-# LD11 Campaign Data Visualization Dashboard
+# LD11 Campaign Dashboard
 
-A comprehensive dashboard for the LD11 team to visualize campaign data and manage voter information.
+A comprehensive dashboard for visualizing 2024 Meta ad spend data and election results for Legislative District 11, with voter database management capabilities.
 
 ## Features
 
-### Data Tab
-- **Ad Spend Analytics**: Visualizations of campaign spending by optimization type and target
-- **Voter Registration Data**: Party affiliation breakdowns and registration statistics
-- **Election Results**: Precinct-level turnout analysis and candidate performance
-- **Interactive Charts**: Bar charts, pie charts, area charts, and data tables
-- **Key Metrics**: Total spend, reach, turnout percentages, and voter counts
+### 📊 Dashboard Tab
+- **Ad Spend Analytics**: Visualize Meta advertising spend by optimization type and target audience
+- **Election Results**: Display precinct-level turnout and candidate performance
+- **Key Metrics**: Total spend, reach, impressions, and voter turnout statistics
+- **Interactive Charts**: Bar charts, pie charts, and area charts for data visualization
+- **Real-time Data**: Refresh functionality to update data from CSV/JSON sources
 
-### Voters Tab
-- **Database Management**: Upload and manage LD11.csv voter data
-- **CSV Import**: Automatic parsing and import of voter information
-- **Data Viewing**: Searchable table of voter records
-- **Database Status**: Real-time connection status monitoring
+### 👥 Voters Tab
+- **Database Management**: MySQL integration for voter data storage
+- **CSV Import**: Upload and process LD11.csv voter files
+- **Data Visualization**: View and manage voter records
+- **Database Status**: Real-time connection monitoring
 
 ## Technology Stack
 
-- **Frontend**: React 18 with Recharts for visualizations
-- **Backend**: PHP with MySQL database
-- **Deployment**: HostGator compatible
+- **Frontend**: React 18 with React Router
+- **Charts**: Recharts for data visualization
+- **Backend**: PHP with MySQL
+- **Deployment**: GitHub Actions to HostGator
+- **Styling**: Custom CSS with mobile-first responsive design
 
-## Installation & Deployment
+## Quick Start
 
-### 1. HostGator Database Setup
+### Prerequisites
 
-1. Log into your HostGator cPanel
-2. Navigate to "MySQL Databases" in the Databases section
-3. Create a new database named "ld11_voters"
-4. Create a new MySQL user with a strong password
-5. Add the user to the database with "All Privileges"
-6. Note down the database details:
-   - Database name: `yourusername_ld11_voters`
-   - Username: `yourusername_dbuser`
-   - Password: `[your chosen password]`
-   - Host: `localhost`
+- Node.js 18+ and npm
+- PHP 7.4+ with MySQL support
+- HostGator hosting account (for deployment)
 
-### 2. Update Database Configuration
+### Local Development
 
-Edit `voters_api.php` and update the database configuration:
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd ld11
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start development server**
+   ```bash
+   npm start
+   ```
+
+4. **Access the application**
+   - Open http://localhost:3000 in your browser
+   - The dashboard will load with sample data from the `public/` folder
+
+### Data Files
+
+The dashboard uses the following data files in the `public/` directory:
+
+- `ld11adspend.csv` - Meta advertising spend data
+- `ld11results.json` - Voter registration statistics
+- `results.csv` - Election results by precinct
+- `LD11.csv` - Voter database for import
+
+## HostGator Deployment
+
+### Automatic Deployment (Recommended)
+
+1. **Set up GitHub Secrets** (see `deploy-config.md` for details):
+   - `HOSTGATOR_HOST`
+   - `HOSTGATOR_USERNAME`
+   - `HOSTGATOR_SSH_KEY`
+
+2. **Push to main branch**:
+   ```bash
+   git push origin main
+   ```
+
+3. **Monitor deployment** in GitHub Actions tab
+
+### Manual Deployment
+
+1. **Build the application**:
+   ```bash
+   npm run build
+   ```
+
+2. **Upload files to HostGator**:
+   - Upload `build/` contents to `/public_html/sunbeltsolutions.org/ld11/`
+   - Upload PHP files to the same directory
+   - Upload `public/` contents to `/public_html/sunbeltsolutions.org/ld11/public/`
+
+3. **Configure Apache** (create `.htaccess`):
+   ```apache
+   Options -MultiViews
+   RewriteEngine On
+   RewriteCond %{REQUEST_FILENAME} !-f
+   RewriteRule ^ index.html [QSA,L]
+   ```
+
+## Database Setup
+
+### MySQL Database Configuration
+
+1. **Log into HostGator cPanel**
+2. **Navigate to "MySQL Databases"**
+3. **Create database**: `ld11_voters`
+4. **Create MySQL user** with strong password
+5. **Add user to database** with "All Privileges"
+6. **Update configuration** in `voters_api.php`:
 
 ```php
 $db_config = [
     'host' => 'localhost',
-    'dbname' => 'yourusername_ld11_voters', // Your actual database name
-    'username' => 'yourusername_dbuser',     // Your actual username
-    'password' => 'your_password_here'       // Your actual password
+    'dbname' => 'yourusername_ld11_voters',
+    'username' => 'yourusername_dbuser',
+    'password' => 'your_secure_password'
 ];
 ```
 
-### 3. Upload Files to HostGator
+### Database Schema
 
-Upload all files to your HostGator public_html directory:
+The application automatically creates the following table:
 
+```sql
+CREATE TABLE voters (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    address TEXT,
+    party VARCHAR(50),
+    precinct VARCHAR(100),
+    voter_id VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 ```
-public_html/
-├── index.php
-├── voters_api.php
-├── package.json
-├── public/
-│   ├── index.html
-│   ├── ld11adspend.csv
-│   ├── ld11results.json
-│   └── results.csv
-└── src/
-    ├── index.js
-    ├── App.js
-    ├── App.css
-    └── components/
-        ├── DataTab.js
-        └── VotersTab.js
-```
-
-### 4. Build React Application
-
-If you have Node.js installed locally:
-
-```bash
-npm install
-npm run build
-```
-
-Then upload the `build/` folder contents to your HostGator directory.
-
-Alternatively, you can use the development version by serving the files directly.
-
-### 5. Access the Dashboard
-
-Visit your domain to access the dashboard:
-- `https://yourdomain.com/` - Main dashboard
-- `https://yourdomain.com/data` - Data visualization tab
-- `https://yourdomain.com/voters` - Voter management tab
-
-## Data Sources
-
-The dashboard uses three main data sources:
-
-1. **ld11adspend.csv**: Campaign advertising data with spending, reach, and performance metrics
-2. **ld11results.json**: Voter registration and turnout data by party affiliation
-3. **results.csv**: Detailed election results by precinct with candidate performance
 
 ## API Endpoints
 
-### Data API (index.php)
-- `?endpoint=adspend` - Ad spend data and analytics
-- `?endpoint=voterdata` - Voter registration data
-- `?endpoint=results` - Election results data
-- `?endpoint=dashboard` - Dashboard summary data
+### Data API (`fixed-api.php`)
 
-### Voters API (voters_api.php)
-- `?action=status` - Check database connection status
-- `?action=fetch` - Retrieve voter records
-- `?action=upload` - Upload CSV file (POST)
-- `?action=clear` - Clear all voter data (POST)
+- `GET /ld11/fixed-api.php?endpoint=adspend` - Ad spend data
+- `GET /ld11/fixed-api.php?endpoint=voterdata` - Voter registration data
+- `GET /ld11/fixed-api.php?endpoint=results` - Election results
+- `GET /ld11/fixed-api.php?endpoint=dashboard` - Dashboard summary
+
+### Voters API (`voters_api.php`)
+
+- `GET /ld11/voters_api.php?action=status` - Database connection status
+- `GET /ld11/voters_api.php?action=fetch` - Retrieve voter records
+- `POST /ld11/voters_api.php?action=upload` - Upload CSV file
+- `POST /ld11/voters_api.php?action=clear` - Clear all voter data
+
+## Mobile Optimization
+
+The dashboard is fully responsive and optimized for mobile devices:
+
+- **Responsive Grid**: Charts and tables adapt to screen size
+- **Touch-Friendly**: Large buttons and touch targets
+- **Mobile Navigation**: Collapsible navigation for small screens
+- **Optimized Typography**: Readable text at all screen sizes
 
 ## File Structure
 
 ```
-├── index.php                 # Main API endpoint for data
-├── voters_api.php           # Voter database management API
-├── package.json             # React dependencies
-├── public/
-│   ├── index.html          # Main HTML template
-│   ├── ld11adspend.csv     # Ad spend data
-│   ├── ld11results.json    # Voter registration data
-│   └── results.csv         # Election results data
-└── src/
-    ├── index.js            # React entry point
-    ├── App.js              # Main React component
-    ├── App.css             # Global styles
-    └── components/
-        ├── DataTab.js      # Data visualization component
-        └── VotersTab.js    # Voter management component
+ld11/
+├── .github/workflows/     # GitHub Actions deployment
+├── public/                # Static assets and data files
+├── src/
+│   ├── components/        # React components
+│   │   ├── DataTab.js     # Dashboard visualizations
+│   │   └── VotersTab.js   # Voter management
+│   ├── App.js            # Main application
+│   ├── App.css           # Styling
+│   └── index.js          # Entry point
+├── *.php                 # Backend API files
+├── package.json          # Dependencies
+├── deploy-config.md      # Deployment instructions
+└── README.md            # This file
 ```
 
-## Usage
+## Contributing
 
-### Data Tab
-- View campaign spending analytics and performance metrics
-- Analyze voter registration patterns by party
-- Review election results and turnout by precinct
-- Export data or take screenshots for reports
-
-### Voters Tab
-1. Ensure database is connected (green status indicator)
-2. Upload your LD11.csv file using the file upload interface
-3. View imported voter data in the table
-4. Use refresh to reload data or clear to remove all records
-
-## Troubleshooting
-
-### Database Connection Issues
-- Verify database credentials in `voters_api.php`
-- Ensure database and user exist in HostGator cPanel
-- Check that user has proper permissions
-
-### File Upload Issues
-- Ensure CSV file is properly formatted
-- Check file size limits on HostGator
-- Verify file permissions on server
-
-### React Build Issues
-- Run `npm install` to install dependencies
-- Use `npm run build` to create production build
-- Ensure all files are uploaded to correct directories
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Make your changes
+4. Test thoroughly
+5. Commit your changes: `git commit -m 'Add feature'`
+6. Push to the branch: `git push origin feature-name`
+7. Submit a pull request
 
 ## Support
 
-For technical support or questions about the dashboard, please contact the development team.
+For issues and questions:
+
+1. Check the GitHub Issues page
+2. Review the deployment configuration in `deploy-config.md`
+3. Verify database connectivity and file permissions
+4. Check browser console for JavaScript errors
 
 ## License
 
-This project is proprietary software for the LD11 campaign team.
+This project is proprietary software for LD11 campaign use.
+
+---
+
+**Built with ❤️ for LD11 Campaign**
